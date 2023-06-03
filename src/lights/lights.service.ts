@@ -3,7 +3,8 @@ import { CreateLightDto } from "./dto/create-light.dto";
 import { UpdateLightDto } from "./dto/update-light.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { Light, LightDocument } from "./scemas/light.schema";
-import { Model } from "mongoose";
+import { Model, ObjectId } from "mongoose";
+import { ToggleLightDto } from "./dto/toggle-light.dto";
 
 @Injectable()
 export class LightsService {
@@ -15,8 +16,19 @@ export class LightsService {
 		return await this.LightModel.find();
 	}
 
-	update(id: number, updateLightDto: UpdateLightDto) {
-		return `This action updates a #${id} light`;
+	async toggle(id: string): Promise<Light[]> {
+		let currentLight: Light = await this.LightModel.findById(id);
+		await this.LightModel.findByIdAndUpdate(
+			{
+				_id: id
+			},
+			{
+				status: !currentLight.status
+			}
+		);
+		// let lightToggled: Light = await this.LightModel.findById(id);
+		// lightToggled.status = !currentLight.status;
+		return await this.findAll();
 	}
 
 	async getStatus() {
